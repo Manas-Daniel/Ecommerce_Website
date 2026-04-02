@@ -1,35 +1,200 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Ecommerce App</title>
+    <title>Retail Store Dot Net</title>
+
     <style>
-        body { font-family: Arial; margin: 20px; }
-        input, button { margin: 5px; padding: 6px; }
-        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f2ff, #f0f7ff);
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(90deg, #007bff, #00c6ff);
+            color: white;
+            padding: 15px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: linear-gradient(180deg, #0056b3, #007bff);
+            color: white;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* MAIN */
+        .container {
+            padding: 20px 40px;
+        }
+
+        .grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #007bff, #00c6ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #productList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #productList li {
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            right: -300px;
+            top: 20px;
+            background: linear-gradient(90deg, #007bff, #00c6ff);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: 0.4s;
+        }
+
+        .toast.show {
+            right: 20px;
+        }
     </style>
 </head>
+
 <body>
 
-<h2>Welcome <span th:text="${name}"></span> 👋</h2>
-
-<div class="box">
-    <h3>Add Product</h3>
-
-    <input type="text" id="name" placeholder="Product Name"><br>
-    <input type="number" id="quantity" placeholder="Quantity"><br>
-    <input type="text" id="description" placeholder="Description"><br>
-    <input type="number" id="price" placeholder="Price"><br>
-
-    <button onclick="addProduct()">Add</button>
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <h3>Menu</h3>
+    <a href="#">Home</a>
+    <a href="#">Products</a>
+    <a href="#">Cart</a>
 </div>
 
-<div class="box">
-    <h3>Product List</h3>
-    <button onclick="getProducts()">Load Products</button>
-    <ul id="productList"></ul>
+<!-- HEADER -->
+<header>
+    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    <h1>Retail Store Dot Net</h1>
+</header>
+
+<div class="container">
+    <h2>Welcome <span th:text="${name}"></span> 👋</h2>
+
+    <div class="grid">
+
+        <div class="box">
+            <h3>Add Product</h3>
+
+            <input type="text" id="name" placeholder="Product Name">
+            <input type="number" id="quantity" placeholder="Quantity">
+            <input type="text" id="description" placeholder="Description">
+            <input type="number" id="price" placeholder="Price">
+
+            <button onclick="addProduct()">Add Product</button>
+        </div>
+
+        <div class="box">
+            <h3>Product List</h3>
+            <button onclick="getProducts()">Load Products</button>
+            <ul id="productList"></ul>
+        </div>
+
+    </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
 
 function addProduct() {
     const product = {
@@ -46,7 +211,7 @@ function addProduct() {
     })
     .then(res => res.json())
     .then(data => {
-        alert("Added: " + data.name);
+        showToast("✅ Added: " + data.name);
         getProducts();
     });
 }
@@ -60,17 +225,16 @@ function getProducts() {
 
         data.forEach(p => {
             const li = document.createElement("li");
-            li.innerText =
-                p.name +
-                " | Qty: " + p.quantity +
-                " | ₹" + p.price +
-                " | " + p.description;
-
+            li.innerHTML = `
+                <b>${p.name}</b><br>
+                Qty: ${p.quantity}<br>
+                ₹${p.price}<br>
+                ${p.description}
+            `;
             list.appendChild(li);
         });
     });
 }
-
 </script>
 
 </body>
