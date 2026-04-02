@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ecommerce App</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        input, button { margin: 5px; padding: 6px; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<h2>Welcome <span th:text="${name}"></span> 👋</h2>
+
+<div class="box">
+    <h3>Add Product</h3>
+
+    <input type="text" id="name" placeholder="Product Name"><br>
+    <input type="number" id="quantity" placeholder="Quantity"><br>
+    <input type="text" id="description" placeholder="Description"><br>
+    <input type="number" id="price" placeholder="Price"><br>
+
+    <button onclick="addProduct()">Add</button>
+</div>
+
+<div class="box">
+    <h3>Product List</h3>
+    <button onclick="getProducts()">Load Products</button>
+    <ul id="productList"></ul>
+</div>
+
+<script>
+
+function addProduct() {
+    const product = {
+        name: document.getElementById("name").value,
+        quantity: document.getElementById("quantity").value,
+        description: document.getElementById("description").value,
+        price: document.getElementById("price").value
+    };
+
+    fetch('/addProduct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Added: " + data.name);
+        getProducts();
+    });
+}
+
+function getProducts() {
+    fetch('/getAllProducts')
+    .then(res => res.json())
+    .then(data => {
+        const list = document.getElementById("productList");
+        list.innerHTML = "";
+
+        data.forEach(p => {
+            const li = document.createElement("li");
+            li.innerText =
+                p.name +
+                " | Qty: " + p.quantity +
+                " | ₹" + p.price +
+                " | " + p.description;
+
+            list.appendChild(li);
+        });
+    });
+}
+
+</script>
+
+</body>
+</html>
